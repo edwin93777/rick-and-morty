@@ -1,0 +1,473 @@
+/* =====================================================================
+   Efectos visuales: header glass (NestJS), blur de scroll, progreso
+   y portal 3D de fondo. Solo transform / opacity en las animaciones.
+   ===================================================================== */
+:root {
+  --nest-red: #e0234e;
+  --nest-red-glow: rgba(224, 35, 78, 0.65);
+  --glass-bg: rgba(14, 16, 18, 0.58);
+  --glass-bg-strong: rgba(12, 14, 16, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-text: rgba(255, 255, 255, 0.92);
+  --glass-text-muted: rgba(255, 255, 255, 0.55);
+  --header-h: 64px;
+}
+
+/* El portal del hero queda sustituido por el portal 3D de fondo */
+.hero__portal {
+  display: none;
+}
+
+/* ===== Header glassmorphism ===== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 8px 28px -14px rgba(0, 0, 0, 0.55);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar[data-scrolled='true'] {
+  background: var(--glass-bg-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 14px 40px -12px rgba(0, 0, 0, 0.75);
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 28px;
+  min-height: 64px;
+  flex-wrap: wrap;
+}
+
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--glass-text);
+  text-decoration: none;
+}
+
+.navbar__logo {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  background: url('/portal.svg') center / cover;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 16px rgba(151, 206, 76, 0.4);
+}
+
+.navbar__name {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.98rem;
+  letter-spacing: -0.01em;
+}
+
+.navbar__subtitle {
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--glass-text-muted);
+}
+
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navbar__links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__links a {
+  position: relative;
+  display: inline-block;
+  padding: 6px 0;
+  color: var(--glass-text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.navbar__links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--nest-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.navbar__links a:hover {
+  color: var(--glass-text);
+}
+
+.navbar__links a:hover::after {
+  transform: scaleX(1);
+}
+
+/* Indicador numérico de progreso */
+.navbar__progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 70px;
+  padding: 4px 12px 4px 6px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--glass-text-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.navbar__ring {
+  transform: rotate(-90deg);
+}
+
+.navbar__ring-track,
+.navbar__ring-value {
+  fill: none;
+  stroke-width: 2;
+}
+
+.navbar__ring-track {
+  stroke: rgba(255, 255, 255, 0.12);
+}
+
+.navbar__ring-value {
+  stroke: var(--nest-red);
+  stroke-linecap: round;
+}
+
+/* Barra de progreso integrada en el borde inferior del header */
+.navbar__track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.navbar__bar {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(224, 35, 78, 0.35), var(--nest-red) 70%, #ff5c80);
+  box-shadow: 0 0 10px var(--nest-red-glow);
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+@media (max-width: 600px) {
+  .navbar__subtitle,
+  .navbar__hide-sm {
+    display: none;
+  }
+
+  .navbar__right,
+  .navbar__links {
+    gap: 16px;
+  }
+}
+
+/* ===== Blur progresivo desde el header ===== */
+.scroll-blur {
+  --fx: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--header-h);
+  height: 48vh;
+  z-index: 9;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.scroll-blur__layer,
+.scroll-blur__tint {
+  position: absolute;
+  inset: 0;
+  opacity: var(--fx);
+}
+
+/* Cada capa difumina más pero cubre menos altura → blur máximo junto al header */
+.scroll-blur__layer {
+  -webkit-backdrop-filter: blur(var(--b));
+  backdrop-filter: blur(var(--b));
+  -webkit-mask-image: linear-gradient(to bottom, #000 var(--m0), transparent var(--m1));
+  mask-image: linear-gradient(to bottom, #000 var(--m0), transparent var(--m1));
+}
+
+.scroll-blur__layer:nth-child(1) { --b: 1px;  --m0: 30%; --m1: 100%; }
+.scroll-blur__layer:nth-child(2) { --b: 3px;  --m0: 12%; --m1: 62%; }
+.scroll-blur__layer:nth-child(3) { --b: 7px;  --m0: 0%;  --m1: 36%; }
+.scroll-blur__layer:nth-child(4) { --b: 14px; --m0: 0%;  --m1: 16%; }
+
+.scroll-blur__tint {
+  background: linear-gradient(to bottom, rgba(12, 16, 18, 0.55), rgba(12, 16, 18, 0) 55%);
+}
+
+/* ===== Portal 3D de fondo ===== */
+.portal-bg {
+  --size: min(92vmin, 880px);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.portal-bg__parallax {
+  position: absolute;
+  left: 72%;
+  top: 46%;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  will-change: transform;
+}
+
+.portal-bg__scene {
+  width: 100%;
+  height: 100%;
+  perspective: 1400px;
+  opacity: 0.34;
+}
+
+.portal-bg__tilt {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(14deg) rotateY(-26deg) rotateZ(0deg);
+  animation: portal-wobble 16s ease-in-out infinite alternate;
+}
+
+.portal-bg__halo,
+.portal-bg__disc,
+.portal-bg__rim,
+.portal-bg__swirl,
+.portal-bg__core {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.portal-bg__halo {
+  inset: -20%;
+  background: radial-gradient(
+    circle,
+    rgba(151, 206, 76, 0.55) 0%,
+    rgba(0, 255, 65, 0.16) 38%,
+    transparent 66%
+  );
+  transform: translateZ(-90px);
+  animation: portal-breathe 5s ease-in-out infinite;
+}
+
+.portal-bg__disc {
+  inset: 6%;
+  background: radial-gradient(
+    circle,
+    #f4ffe0 0%,
+    #b8f06a 20%,
+    #4fa83a 46%,
+    rgba(20, 80, 30, 0.75) 64%,
+    transparent 71%
+  );
+  transform: translateZ(-40px);
+}
+
+.portal-bg__rim {
+  inset: 3%;
+  background: conic-gradient(
+    #97ce4c,
+    #00ff41,
+    #d9f99d,
+    #2e8b3a,
+    #97ce4c,
+    #c6ff7a,
+    #00ff41,
+    #97ce4c
+  );
+  -webkit-mask-image: radial-gradient(closest-side, transparent 78%, #000 85%, #000 93%, transparent 100%);
+  mask-image: radial-gradient(closest-side, transparent 78%, #000 85%, #000 93%, transparent 100%);
+  filter: blur(1.5px);
+  transform: translateZ(-10px);
+  animation: portal-rotate 9s linear infinite;
+  will-change: transform;
+}
+
+.portal-bg__swirl {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  will-change: transform;
+}
+
+.portal-bg__swirl--back {
+  transform: translateZ(0);
+  animation: portal-rotate-reverse 24s linear infinite;
+}
+
+.portal-bg__swirl--front {
+  inset: 10%;
+  width: 80%;
+  height: 80%;
+  transform: translateZ(45px);
+  animation: portal-rotate 11s linear infinite;
+}
+
+.portal-bg__core {
+  inset: 34%;
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    #eaffc8 24%,
+    rgba(151, 206, 76, 0.6) 52%,
+    transparent 72%
+  );
+  transform: translateZ(70px);
+  animation: portal-pulse 2.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.portal-bg__sparks {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(20px);
+}
+
+.portal-bg__spark {
+  position: absolute;
+  left: calc(var(--s) / -2);
+  top: calc(var(--s) / -2);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 6px var(--c), 0 0 14px var(--c);
+  opacity: 0;
+  animation: portal-spark var(--dur) linear var(--delay) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes portal-rotate {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes portal-rotate-reverse {
+  to {
+    rotate: -360deg;
+  }
+}
+
+@keyframes portal-pulse {
+  0%,
+  100% {
+    scale: 0.86;
+    opacity: 0.75;
+  }
+  50% {
+    scale: 1.1;
+    opacity: 1;
+  }
+}
+
+@keyframes portal-breathe {
+  0%,
+  100% {
+    scale: 0.95;
+    opacity: 0.7;
+  }
+  50% {
+    scale: 1.06;
+    opacity: 1;
+  }
+}
+
+@keyframes portal-wobble {
+  to {
+    transform: rotateX(6deg) rotateY(-14deg) rotateZ(4deg);
+  }
+}
+
+@keyframes portal-spark {
+  0% {
+    transform: rotate(var(--a)) translate3d(calc(var(--size) * var(--d) * 0.45), 0, var(--z)) scale(0.3);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: rotate(calc(var(--a) + 70deg)) translate3d(calc(var(--size) * var(--d)), 0, var(--z)) scale(1);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .portal-bg {
+    --size: 110vmin;
+  }
+
+  .portal-bg__parallax {
+    left: 60%;
+    top: 34%;
+  }
+
+  .portal-bg__scene {
+    opacity: 0.26;
+  }
+}
+
+/* ===== Accesibilidad: movimiento reducido ===== */
+@media (prefers-reduced-motion: reduce) {
+  .portal-bg *,
+  .navbar__links a::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .portal-bg__spark {
+    opacity: 0.5;
+    transform: rotate(var(--a)) translate3d(calc(var(--size) * var(--d) * 0.8), 0, var(--z));
+  }
+}

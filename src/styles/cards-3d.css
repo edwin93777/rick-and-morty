@@ -1,0 +1,487 @@
+/* =====================================================================
+   Logo: portal con espiral giratoria
+   ===================================================================== */
+.navbar__logo {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  background: none;
+  box-shadow: 0 0 18px rgba(151, 206, 76, 0.45);
+  perspective: 300px;
+}
+
+.portal-logo {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotateY(-22deg) rotateX(10deg);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.navbar__brand:hover .portal-logo,
+.navbar__brand:focus-visible .portal-logo {
+  transform: rotateY(0deg) rotateX(0deg) scale(1.14);
+}
+
+.portal-logo__swirl,
+.portal-logo__rim,
+.portal-logo__core {
+  transform-origin: 32px 32px;
+}
+
+.portal-logo__swirl {
+  animation: portal-rotate 7s linear infinite;
+}
+
+.portal-logo__rim {
+  animation: portal-rotate-reverse 14s linear infinite;
+}
+
+.portal-logo__rim--outer {
+  animation: portal-rotate 10s linear infinite;
+}
+
+.portal-logo__core {
+  animation: portal-pulse 2.4s ease-in-out infinite;
+}
+
+/* =====================================================================
+   Buscador: el panel mantiene su forma al buscar
+   ===================================================================== */
+/* Tres filas compartidas (etiqueta / campo / estado): los filtros quedan
+   siempre alineados con el campo, aparezca o no la línea de estado. */
+.controls {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto;
+  align-items: center;
+  gap: 0 32px;
+}
+
+.search {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  min-width: 0;
+}
+
+.filters {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.search__input {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Ancho fijo: "Buscar" y "Buscando…" ocupan lo mismo */
+.search__submit {
+  flex: none;
+  min-width: 8.75rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Siempre una sola línea, con elipsis si la búsqueda es larga */
+.search__status {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  min-height: 1.55em;
+  white-space: nowrap;
+}
+
+.search__query {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search__status .link-button {
+  flex: none;
+}
+
+/* Reserva el hueco de la barra de scroll: la página no se mueve de lado
+   cuando los resultados aparecen o desaparecen */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* La zona de resultados no se encoge mientras carga */
+.results {
+  min-height: 80vh;
+}
+
+@media (max-width: 860px) {
+  .controls {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  .search {
+    display: block;
+    grid-row: auto;
+  }
+
+  .filters {
+    grid-column: 1;
+    grid-row: auto;
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .search__submit {
+    width: 100%;
+  }
+}
+
+/* =====================================================================
+   Estado de carga: portal, barra de 5 s y frases de Rick
+   ===================================================================== */
+.loading {
+  align-content: center;
+  gap: 18px;
+  min-height: 62vh;
+  padding: 48px 0;
+  text-align: center;
+}
+
+.loading {
+  overflow-x: clip;
+}
+
+/* ----- Portal de carga 3D ----- */
+.loading-portal {
+  --size: 168px;
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  margin-bottom: 14px;
+  perspective: 620px;
+  animation: loading-portal-float 3s ease-in-out infinite;
+}
+
+.loading-portal__tilt {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(16deg) rotateY(-34deg);
+  animation: loading-portal-tilt 4.5s ease-in-out infinite;
+}
+
+.loading-portal__layer,
+.loading-portal__halo,
+.loading-portal__core {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.loading-portal__layer {
+  overflow: visible;
+}
+
+.loading-portal__halo {
+  inset: -28%;
+  width: auto;
+  height: auto;
+  background: radial-gradient(circle, rgba(120, 255, 70, 0.55) 0%, rgba(0, 255, 65, 0.2) 40%, transparent 68%);
+  transform: translateZ(-34px);
+  animation: portal-breathe 1.8s ease-in-out infinite;
+}
+
+/* Dos contornos irregulares girando en sentidos opuestos: el borde "hierve" */
+.loading-portal__layer--blob-back {
+  transform: translateZ(-18px);
+  animation: portal-rotate-reverse 7s linear infinite;
+}
+
+.loading-portal__layer--blob-front {
+  transform: translateZ(-8px);
+  animation: portal-rotate 5s linear infinite;
+}
+
+.loading-portal__layer--disc {
+  transform: translateZ(0);
+}
+
+/* Remolinos: cuanto más cerca del centro, más rápido y más adelante */
+.loading-portal__layer--dark {
+  transform: translateZ(10px);
+  animation: portal-rotate 3.2s linear infinite;
+}
+
+.loading-portal__layer--mid {
+  transform: translateZ(22px);
+  animation: portal-rotate 2.2s linear infinite;
+}
+
+.loading-portal__layer--light {
+  transform: translateZ(34px);
+  animation: portal-rotate 1.5s linear infinite;
+}
+
+.loading-portal__core {
+  inset: 40%;
+  width: auto;
+  height: auto;
+  background: radial-gradient(circle, #ffffff 0%, #fbffc4 45%, rgba(223, 247, 102, 0) 75%);
+  transform: translateZ(46px);
+  animation: portal-pulse 1.2s ease-in-out infinite;
+}
+
+.loading-portal__drops {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+.loading-portal__drop {
+  position: absolute;
+  left: calc(var(--s) / -2);
+  top: calc(var(--s) / -2);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: #7be63f;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.8);
+  opacity: 0;
+  animation: portal-spark var(--dur) ease-out var(--delay) infinite;
+}
+
+@keyframes loading-portal-tilt {
+  0%,
+  100% {
+    transform: rotateX(16deg) rotateY(-34deg);
+  }
+  50% {
+    transform: rotateX(-12deg) rotateY(34deg);
+  }
+}
+
+@keyframes loading-portal-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-portal,
+  .loading-portal * {
+    animation: none !important;
+  }
+
+  .loading-portal__drop {
+    opacity: 0.8;
+    transform: rotate(var(--a)) translate3d(calc(var(--size) * var(--d)), 0, var(--z));
+  }
+}
+
+.loading__bar {
+  width: min(320px, 80%);
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.loading__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #97ce4c, #00ff41);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+  transform-origin: left center;
+  animation: loading-fill var(--loading-duration, 5000ms) linear both;
+}
+
+.loading__quote {
+  max-width: 44ch;
+  min-height: 3.4em;
+  margin: 6px 0 0;
+  color: var(--plasma-pale);
+  font-size: 1.1rem;
+  font-style: italic;
+  text-wrap: balance;
+  animation: quote-in 0.5s ease both;
+}
+
+.loading__quote-mark {
+  margin-right: 2px;
+  color: var(--portal-green);
+  font-family: var(--font-display);
+  font-size: 1.5em;
+  font-style: normal;
+  line-height: 0;
+}
+
+.loading__quote-author {
+  color: var(--plasma-muted);
+  font-size: 0.85rem;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+@keyframes loading-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes quote-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* =====================================================================
+   Tarjetas en 3D
+   ===================================================================== */
+.grid__item {
+  perspective: 1000px;
+  animation: card-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Entrada escalonada por tandas de diez */
+.grid__item:nth-child(10n + 2)  { animation-delay: 0.06s; }
+.grid__item:nth-child(10n + 3)  { animation-delay: 0.12s; }
+.grid__item:nth-child(10n + 4)  { animation-delay: 0.18s; }
+.grid__item:nth-child(10n + 5)  { animation-delay: 0.24s; }
+.grid__item:nth-child(10n + 6)  { animation-delay: 0.3s; }
+.grid__item:nth-child(10n + 7)  { animation-delay: 0.36s; }
+.grid__item:nth-child(10n + 8)  { animation-delay: 0.42s; }
+.grid__item:nth-child(10n + 9)  { animation-delay: 0.48s; }
+.grid__item:nth-child(10n + 10) { animation-delay: 0.54s; }
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) translateY(30px) rotateX(-24deg) scale(0.94);
+  }
+}
+
+/* Base de la tarjeta: canto grueso (sombras apiladas) y rotación por variables */
+.card {
+  overflow: visible;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  background: linear-gradient(160deg, #193639 0%, var(--space-panel) 45%, #0f2226 100%);
+  box-shadow:
+    0 1px 0 #2c555b,
+    0 2px 0 #224449,
+    0 3px 0 #19373b,
+    0 4px 0 #112a2e,
+    0 18px 26px -14px rgba(0, 0, 0, 0.7);
+  transition:
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s ease,
+    border-color 0.2s;
+}
+
+.card.is-tilting {
+  transition: transform 0.1s linear, box-shadow 0.4s ease, border-color 0.2s;
+}
+
+/* La foto es un plano propio que flota sobre la base */
+.card__media {
+  border-radius: 13px 13px 0 0;
+  transform-style: preserve-3d;
+  transform: translateZ(0);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+  /* los clics atraviesan la foto y llegan al botón que cubre la tarjeta */
+  pointer-events: none;
+}
+
+.card__media img,
+.card__fallback {
+  border-radius: inherit;
+}
+
+/* ...y la etiqueta de estado flota sobre la foto */
+.card__status {
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+}
+
+/* Brillo que sigue al puntero */
+.card::before,
+.card__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 0%),
+    rgba(255, 255, 255, 0.2),
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.card__media::after {
+  transform: translateZ(1px);
+}
+
+.card:focus-within {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(14px);
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(14px);
+    box-shadow:
+      0 1px 0 #2c555b,
+      0 2px 0 #224449,
+      0 3px 0 #19373b,
+      0 4px 0 #112a2e,
+      0 36px 44px -20px rgba(0, 0, 0, 0.8),
+      0 0 36px -10px rgba(151, 206, 76, 0.4);
+  }
+
+  .card:hover .card__media {
+    transform: translateZ(30px);
+    box-shadow: 0 18px 22px -14px rgba(0, 0, 0, 0.75);
+  }
+
+  .card:hover .card__status {
+    transform: translateZ(26px);
+    box-shadow: 0 8px 14px -6px rgba(0, 0, 0, 0.7);
+  }
+
+  .card:hover::before,
+  .card:hover .card__media::after {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-logo,
+  .portal-logo * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .grid__item {
+    animation: none;
+  }
+}
