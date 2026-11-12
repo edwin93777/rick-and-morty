@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import LoadingPortal from './LoadingPortal.jsx';
+import Portal3D from './Portal3D.jsx';
 import { RICK_QUOTES, nextQuoteIndex } from '../utils/rickQuotes.js';
 
 const QUOTE_INTERVAL_MS = 2500;
@@ -18,7 +18,7 @@ function Loading({ message = 'Cargando...', duration = 5000 }) {
 
   return (
     <div className="loading" style={{ '--loading-duration': `${duration}ms` }}>
-      <LoadingPortal />
+      <Portal3D />
 
       <p className="loading__text" role="status" aria-live="polite">
         {message}

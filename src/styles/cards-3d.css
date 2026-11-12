@@ -154,7 +154,56 @@ html {
   overflow-x: clip;
 }
 
-/* ----- Portal de carga 3D ----- */
+/* ----- Portal de carga 3D: modelo de Blender dibujado con three.js ----- */
+.portal3d {
+  position: relative;
+  display: block;
+  width: 230px;
+  height: 300px;
+  margin-bottom: 2px;
+}
+
+.portal3d__halo {
+  position: absolute;
+  inset: 12% 4%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(120, 255, 70, 0.4),
+    rgba(0, 255, 65, 0.14) 55%,
+    transparent 100%
+  );
+  animation: portal-breathe 2.2s ease-in-out infinite;
+}
+
+/* El portal "se abre" cuando el modelo termina de cargar */
+.portal3d__host {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(0.55);
+  transition: opacity 0.45s ease, transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+
+.portal3d--ready .portal3d__host {
+  opacity: 1;
+  transform: none;
+}
+
+.portal3d__host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 600px) {
+  .portal3d {
+    width: 190px;
+    height: 248px;
+  }
+}
+
+/* ----- Portal de carga en CSS: reserva si el navegador no tiene WebGL ----- */
 .loading-portal {
   --size: 168px;
   display: block;
